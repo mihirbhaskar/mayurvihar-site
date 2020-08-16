@@ -1,0 +1,11 @@
+# Font style metadata
+name = "My font set"
+
+# Optional Google font URL
+google_fonts = "family=Metrophobic"
+
+# Font families
+heading_font = "Metrophobic"
+body_font = "Metrophobic"
+nav_font = "Metrophobic"
+mono_font = "Metrophobic"
