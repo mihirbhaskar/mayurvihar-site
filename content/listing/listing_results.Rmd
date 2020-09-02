@@ -1,0 +1,95 @@
+---
+title: "About the community"
+author: "Mihir Bhaskar"
+date: "30/08/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+
+# Clear workspace
+rm(list = ls())
+
+pacman::p_load(tidyverse, sp, leaflet, rgdal, maptools, tmap, stringr)
+
+# Import listing hh data
+hh <- as.data.frame(read.csv('D:/Dropbox/Mayur Vihar Project/full_master_hh_data.csv')) 
+
+# Import listing individual data
+ind <- as.data.frame(read.csv('D:/Dropbox/Mayur Vihar Project/full_master_ind_data.csv')) 
+
+# Import boundary shapefile, drawn using Google Maps and exported as .kml
+boundaries <- readOGR("D:/Dropbox/Mayur Vihar Project/Listing Survey/Data/Raw/Blocks for listing.kml",
+                      require_geomType='wkbPolygon')
+
+# Dropping cases without HHID (basically cases that were found in the net distribution but didn't match)
+hh <- hh[hh$hhid != "",]
+
+```
+
+## What, why and how?
+
+We decided that if we were going to work with this community, it was important to:
+
+1. Define the boundaries clearly and get a sense of the total number of individuals and households living within these boundaries. This would in-turn help in the planning and logistics of any sub-project by answering questions like: "How many mosquito nets should we procure?"
+
+2. Understand some basic socio-demographic characteristics to help brainstorm and target the most useful interventions. For example, finding out if the community primarily comprises of young men living alone or of full families would inform a very different set of interventions. 
+
+Talk about some caveats: possible that people missed huts, newly trained surveyors. 
+
+## Demographics
+
+In total, we found `r nrow(hh)` households, totalling `r sum(hh$hh_size, na.rm = TRUE)` individuals. The survey was done between 10th July and 18th July; while this was after the lifting of lockdown, we believe this may be an underestimate of around 100-200 households, who had returned home as a result of lockdown.
+
+```{r population}
+
+# Creating map showing HH distribution of points
+
+## Merging blockwise population onto the shapefiles
+
+blocklevel <- as.data.frame(table(hh$block))
+
+colnames(blocklevel)[1] <- "block"
+colnames(boundaries@data)[1] <- "block"
+
+boundaries@data <- merge(boundaries@data, blocklevel, by = 'block') 
+
+## Creating leaflet plot with layers 
+
+leaflet(hh[hh$location_accuracy <= 20,]) %>% addTiles %>% #addProviderTiles("Esri.WorldImagery") %>% 
+  addPolygons(data = boundaries, color = 'black', weight = 1, highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = TRUE),
+          popup = paste0('Block ',boundaries@data$block,': ',boundaries@data$Freq,' households')) %>%
+  addCircles(~longitude, ~latitude, radius = 1, color = 'black')
+  
+
+
+# Household size distribution
+ggplot(hh, aes(x = hh_size)) + geom_bar()
+
+# Individual age distribution
+ggplot(ind, aes(x = age)) + geom_histogram()
+
+# Religion distribution
+ggplot(hh, aes(x = religion)) + geom_bar()
+
+
+```
+
+
+- Education levels
+
+Timing of survey; many people had gone back home due to coronavirus
+
+## Access to services
+
+- Length of stay
+- Household-level; ration card, with at least one member having a bank account
+- % with aadhaar, % of hhs with ration, % of adults with bakn accounts, with voter IDs
+(differences in bank account ownership between males and efmales, by age)
+- Do these on a map with the dots to see an clear patterns
+
+Bank account; check if it is correlated with age at all. Check the dynamics; if people co-located close to each other are more likely to have an account

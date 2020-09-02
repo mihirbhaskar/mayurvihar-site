@@ -1,5 +1,5 @@
 ---
-title: "Intro"
+title: "About the project"
 author: "Mihir Bhaskar"
 date: "16/08/2020"
 output: html_document
@@ -14,7 +14,7 @@ boundaries <- readOGR("D:/Dropbox/Mayur Vihar Project/Listing Survey/Data/Raw/Bl
 
 ```
 
-Community project in Mayur Vihar Phase-I, Delhi.
+This website showcases work on a small scale community development project in New Delhi. We have been working with 'jhuggis' (slums) near the banks of the Yamuna River in Mayur Vihar Phase-I. 
 
 
 ```{r boundary}
@@ -23,16 +23,17 @@ Community project in Mayur Vihar Phase-I, Delhi.
 
 #boundaries@data <- left_join(boundaries@data, survey, by = 'block_name') 
 
-
 leaflet() %>% addTiles() %>% addPolygons(data = boundaries)
+
 ```
 
-## Including Plots
+By virtue of the location
 
-You can also embed plots, for example:
+-	Delhi government says development can’t happen because it’s 300m from the banks of the Yamuna 
+-	However, the issue is Delhi Development Authority (DDA) comes and demolishes constructions and evicts people without giving fair dues https://www.hindustantimes.com/cities/dda-demolishes-hundreds-of-hutments-on-yamuna-floodplain/story-x105Sl8yPf2tLgUFM0XLRK.html
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
+- Some photos of the area; mainly engaged in agriculture, living in huts, some as labourers. Migrant community
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+It is sometimes hard to believe that such a community exists in the heart of the nation's capital 
+
