@@ -3,6 +3,7 @@ title: "About the project"
 author: "Mihir Bhaskar"
 date: "16/08/2020"
 output: html_document
+weight: 10
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +15,13 @@ boundaries <- readOGR("D:/Dropbox/Mayur Vihar Project/Listing Survey/Data/Raw/Bl
 
 ```
 
-This website showcases work on a small scale community development project in New Delhi. We have been working with 'jhuggis' (slums) near the banks of the Yamuna River in Mayur Vihar Phase-I. 
+This website showcases work on a small scale community development project in New Delhi. Focusing on the 'jhuggis' (slums) near the banks of the Yamuna River in Mayur Vihar Phase-I, the project team (link) has been working to:
+
+1. **Develop a detailed understanding of the community to help plan interventions for longer-term and sustained improvements in quality of life.** You can read more about our efforts on this front by visiting the 'About the community' page (link)
+
+2. **Fulfill pressing, short-term needs through targeted campaigns.** The two campaigns completed so far include free distribution of tarpaulins as storm relief, and free distribution of mosquito nets in anticipation of the monsoons; you can read more about these by clicking on the respective tabs.
+
+You can see the specific areas we are focusing on highlighted in blue on the map below, and get a rough sense of how things look 'on the ground' through the pictures. We sometimes still find it hard to believe that such a community exists in the heart of the nation's capital! 
 
 
 ```{r boundary}
@@ -26,14 +33,3 @@ This website showcases work on a small scale community development project in Ne
 leaflet() %>% addTiles() %>% addPolygons(data = boundaries)
 
 ```
-
-By virtue of the location
-
--	Delhi government says development can’t happen because it’s 300m from the banks of the Yamuna 
--	However, the issue is Delhi Development Authority (DDA) comes and demolishes constructions and evicts people without giving fair dues https://www.hindustantimes.com/cities/dda-demolishes-hundreds-of-hutments-on-yamuna-floodplain/story-x105Sl8yPf2tLgUFM0XLRK.html
-
-- Some photos of the area; mainly engaged in agriculture, living in huts, some as labourers. Migrant community
-
-
-It is sometimes hard to believe that such a community exists in the heart of the nation's capital 
-

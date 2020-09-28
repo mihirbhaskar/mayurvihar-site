@@ -1,8 +1,8 @@
 ---
-title: "About the community"
+title: "Census survey"
 author: "Mihir Bhaskar"
-date: "30/08/2020"
 output: html_document
+weight: 10
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +14,18 @@ knitr::opts_chunk$set(message = FALSE)
 # Clear workspace
 rm(list = ls())
 
-pacman::p_load(tidyverse, sp, leaflet, rgdal, maptools, tmap, stringr)
+pacman::p_load(tidyverse, sp, leaflet, rgdal, maptools, tmap, stringr, ggthemes, knitr, ggmap)
+
+# Creating easy table function for displaying using kable
+tab <- function(x, y){
+  
+  y <- enquo(y)
+  
+  x %>% group_by(!!y) %>% summarise(n = n()) %>%
+    
+    mutate(percent = round((n/sum(n)), 3)) %>% arrange(desc(n))
+  
+}
 
 # Import listing hh data
 hh <- as.data.frame(read.csv('D:/Dropbox/Mayur Vihar Project/full_master_hh_data.csv')) 
@@ -29,62 +40,96 @@ boundaries <- readOGR("D:/Dropbox/Mayur Vihar Project/Listing Survey/Data/Raw/Bl
 # Dropping cases without HHID (basically cases that were found in the net distribution but didn't match)
 hh <- hh[hh$hhid != "",]
 
+# Setting Google API key for base maps
+api_key <- "AIzaSyAUMxyqhKjoFITUEEESgXVQojItbVBzDus"
+register_google(key = api_key)
+
 ```
 
-## What, why and how?
+## Motivation
 
-We decided that if we were going to work with this community, it was important to:
+We decided that if we were going to work with a community, it was important to:
 
 1. Define the boundaries clearly and get a sense of the total number of individuals and households living within these boundaries. This would in-turn help in the planning and logistics of any sub-project by answering questions like: "How many mosquito nets should we procure?"
 
-2. Understand some basic socio-demographic characteristics to help brainstorm and target the most useful interventions. For example, finding out if the community primarily comprises of young men living alone or of full families would inform a very different set of interventions. 
+2. Understand some socio-demographic characteristics to help brainstorm and target the most useful interventions. For example, finding out if the community primarily comprises of young men living alone or of full families would inform a very different set of interventions. 
 
-Talk about some caveats: possible that people missed huts, newly trained surveyors. 
+## What we did
+
+We designed and conducted a **short survey** intended to capture basic details about **every household** living within the defined boundaries. You can see these boundaries on the homepage.
+
+Our local coordinator identified and trained 12 surveyors to go door-to-door and fill out a digital form using SurveyCTO on their smartphones. You can view the form [**here**](https://mayurvihar.surveycto.com/collect/listing_v1?caseid=). 
+
+The survey ran from 10th to 18th July, 2020 and covered `r nrow(hh)` households. Results from this data are presented below.
+
+Before proceeding, it's worth flagging a few caveats and challenges faced during this exercise:
+
+- Coverage: While the survey was conducted after the nationwide Covid-19 lockdown was lifted, several migrant households in the community that had travelled to their native villages had not returned. Our local coordinator believes there are approximately 200 households like this; it is unclear how many will return in the coming months. 
+
+- Data quality: The surveyors had no prior digital data collection experience. While the survey was simple, there is a possibility that huts were missed or minor errors crept into data collection, particularly for potentially tricky questions such as identifying who counts as a household member. While surveyors were monitored closely during data collection, conducting back-checks on the data was outside the scope of this activity and so it is tough to quantify the magnitude of such errors. That said, the team remains confident that the data is good enough to meet the purposes laid out above.
 
 ## Demographics
 
-In total, we found `r nrow(hh)` households, totalling `r sum(hh$hh_size, na.rm = TRUE)` individuals. The survey was done between 10th July and 18th July; while this was after the lifting of lockdown, we believe this may be an underestimate of around 100-200 households, who had returned home as a result of lockdown.
+In total, we found `r nrow(hh)` households, totalling `r sum(hh$hh_size, na.rm = TRUE)` individuals. The map below shows the spatial distribution of households; there appear to be a few clear clusters of households closer to the Noida Link Road and Mayur Vihar-1, with density decreasing closer to the river's edge.   
 
-```{r population}
+```{r fullmap}
 
 # Creating map showing HH distribution of points
-
-## Merging blockwise population onto the shapefiles
-
-blocklevel <- as.data.frame(table(hh$block))
-
-colnames(blocklevel)[1] <- "block"
-colnames(boundaries@data)[1] <- "block"
-
-boundaries@data <- merge(boundaries@data, blocklevel, by = 'block') 
-
-## Creating leaflet plot with layers 
-
-leaflet(hh[hh$location_accuracy <= 20,]) %>% addTiles %>% #addProviderTiles("Esri.WorldImagery") %>% 
-  addPolygons(data = boundaries, color = 'black', weight = 1, highlightOptions = highlightOptions(color = "white", weight = 2, bringToFront = TRUE),
-          popup = paste0('Block ',boundaries@data$block,': ',boundaries@data$Freq,' households')) %>%
-  addCircles(~longitude, ~latitude, radius = 1, color = 'black')
-  
+boundariesdta <- fortify(boundaries)
 
 
-# Household size distribution
-ggplot(hh, aes(x = hh_size)) + geom_bar()
-
-# Individual age distribution
-ggplot(ind, aes(x = age)) + geom_histogram()
-
-# Religion distribution
-ggplot(hh, aes(x = religion)) + geom_bar()
-
+qmplot(data = hh[hh$location_accuracy < 20,], x = longitude, y = latitude) +
+  stat_density2d(aes(fill = ..level..), bins = 30, size = 0.01, geom = "polygon", alpha = 0.1) 
 
 ```
 
 
-- Education levels
+
+```{r demographisc}
+# Household size distribution
+hhsize_mean <- mean(hh$hh_size, na.rm = TRUE) %>% round(digits = 1)
+hhsize_sd <- sd(hh$hh_size, na.rm = TRUE) %>% round(digits = 1)
+
+ggplot(hh, aes(x = hh_size)) + 
+  geom_bar(fill = 'tomato', color = 'firebrick4', alpha = 0.3) + 
+  geom_vline(xintercept = hhsize_mean, size = 0.5) + 
+  scale_x_discrete("Number of members in the household", breaks=1:10)+
+  theme_tufte()+
+  ggtitle("Distribution of household size", subtitle = paste("Mean =",hhsize_mean,"members | St. dev =",hhsize_sd))
+
+# Gender distribution
+tab(ind, gender) %>% filter(gender != "") %>% kable()
+
+# Individual age distribution
+age_mean <- mean(ind$age, na.rm = TRUE) %>% round(digits = 1)
+age_sd <- sd(ind$age, na.rm = TRUE) %>% round(digits = 1)
+
+ind$under_18 <- as.factor(ind[,'age'] < 18)
+levels(ind$under_18) <- c('Under 18 years','Above 18 years')
+
+ggplot(ind, aes(x = age)) + 
+  geom_histogram(aes(y = ..density.., fill = under_18), binwidth = 2) + 
+  geom_density(size = 1, adjust = 5, color = 'firebrick4') + 
+  ggtitle("Distribution of age", subtitle = paste("Mean =",age_mean,"years | St. dev =",age_sd)) 
+
+
+ggplot(subset(ind, gender == 'Male' | gender == 'Female'), aes(x = age)) + 
+  geom_histogram(aes(y = ..density..), binwidth = 2) + 
+  geom_density(size = 1, adjust = 5, color = 'firebrick4') + 
+  facet_wrap(~gender)
+
+
+
+```
+
+It is clear from both the household size and age distribution of the dataset, that this community primarily consists of families living together. The average household size is `r hhsize_mean` members, and `r mean(ind$under_18, na.rm = TRUE)*100 %>% round(digits = 1)`% of individuals are under the age of 18. The age distribution is particularly striking; there are very few elderly in the community.
+
 
 Timing of survey; many people had gone back home due to coronavirus
 
-## Access to services
+## Access to services (and therefore basic government schemes)
+
+- Talk about JAM trinity; duplicate phone numbers? Multiple HHs giving the same number
 
 - Length of stay
 - Household-level; ration card, with at least one member having a bank account
@@ -93,3 +138,16 @@ Timing of survey; many people had gone back home due to coronavirus
 - Do these on a map with the dots to see an clear patterns
 
 Bank account; check if it is correlated with age at all. Check the dynamics; if people co-located close to each other are more likely to have an account
+
+Note that for geospatial stuff - we are in Delhi, so it is unlikely that there is systematically bad network coverage in certain pockets - a reasonable assumption that these were random - pass the visual test that we see points everywhere. So it's fine to keep only those with a better accuracy and analyse them. 
+
+## Access to basic items
+
+
+-	Delhi government says development can’t happen because it’s 300m from the banks of the Yamuna 
+-	However, the issue is Delhi Development Authority (DDA) comes and demolishes constructions and evicts people without giving fair dues https://www.hindustantimes.com/cities/dda-demolishes-hundreds-of-hutments-on-yamuna-floodplain/story-x105Sl8yPf2tLgUFM0XLRK.html
+
+- Some photos of the area; mainly engaged in agriculture, living in huts, some as labourers. Migrant community
+
+
+
