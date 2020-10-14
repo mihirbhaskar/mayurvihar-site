@@ -14,6 +14,7 @@ knitr::opts_chunk$set(message = FALSE)
 # Clear workspace
 rm(list = ls())
 
+# Load packages (easy loading through pacman)
 pacman::p_load(tidyverse, sp, leaflet, rgdal, maptools, tmap, stringr, ggthemes, knitr, ggmap)
 
 # Creating easy table function for displaying using kable
@@ -27,6 +28,12 @@ tab <- function(x, y){
   
 }
 
+# Setting Google API key for base maps
+api_key <- "AIzaSyAUMxyqhKjoFITUEEESgXVQojItbVBzDus"
+register_google(key = api_key)
+
+#### Importing data and basic processing for analysis ####
+
 # Import listing hh data
 hh <- as.data.frame(read.csv('D:/Dropbox/Mayur Vihar Project/full_master_hh_data.csv')) 
 
@@ -39,10 +46,35 @@ boundaries <- readOGR("D:/Dropbox/Mayur Vihar Project/Listing Survey/Data/Raw/Bl
 
 # Dropping cases without HHID (basically cases that were found in the net distribution but didn't match)
 hh <- hh[hh$hhid != "",]
+hh <- hh[hh$consent == "Yes",]
+ind <- ind[ind$consent == "Yes",]
 
-# Setting Google API key for base maps
-api_key <- "AIzaSyAUMxyqhKjoFITUEEESgXVQojItbVBzDus"
-register_google(key = api_key)
+# Creating age categories
+ind$age_group <- cut(ind$age, breaks = c(0,5,18,30,45,65,150), right = FALSE,
+                     labels = c('Under 5','5-17 years', '18-29 years', '30-44 years', 
+                                '45-64 years', '65 and above'))
+
+ind$under_18 <- as.factor(ind[,'age'] >= 18)
+levels(ind$under_18) <- c('Under 18 years','Above 18 years')
+
+# Re-leveling length of stay var
+hh$length_of_stay <- factor(hh$length_of_stay, levels = 
+                              c("","Keep coming and going","0 to 1 year","1 to 5 years",
+                                "5 to 10 years","10 to 20 years","20 years or more"))
+
+ind$length_of_stay <- factor(ind$length_of_stay, levels = 
+                              c("","Keep coming and going","0 to 1 year","1 to 5 years",
+                                "5 to 10 years","10 to 20 years","20 years or more"))
+
+# Creating education categories
+ind$edu_group <- cut(ind$edu_level, c(-100,-87,4,9,11,12,15,18),
+                     labels = c('Did not know or respond','Below primary/no formal education',
+                                'Completed primary','10th pass','12th pass','Completed degree/diploma','Others'), right = TRUE) 
+
+ind$edu_group[ind$edu_level == 16] <- 'Below primary/no formal education' # Anganwadi/nursery school reclassifying
+
+ind$edu_group[ind$edu_level == 17] <- 'Below primary/no formal education' # Home schooled
+
 
 ```
 
@@ -58,96 +90,56 @@ We decided that if we were going to work with a community, it was important to:
 
 We designed and conducted a **short survey** intended to capture basic details about **every household** living within the defined boundaries. You can see these boundaries on the homepage.
 
-Our local coordinator identified and trained 12 surveyors to go door-to-door and fill out a digital form using SurveyCTO on their smartphones. You can view the form [**here**](https://mayurvihar.surveycto.com/collect/listing_v1?caseid=). 
+Our local coordinator, Vikram, identified and trained 12 surveyors to go door-to-door and fill out a digital form using SurveyCTO on their smartphones. You can view the form [**here**](https://mayurvihar.surveycto.com/collect/listing_v1?caseid=). 
 
 The survey ran from 10th to 18th July, 2020 and covered `r nrow(hh)` households. Results from this data are presented below.
 
 Before proceeding, it's worth flagging a few caveats and challenges faced during this exercise:
 
-- Coverage: While the survey was conducted after the nationwide Covid-19 lockdown was lifted, several migrant households in the community that had travelled to their native villages had not returned. Our local coordinator believes there are approximately 200 households like this; it is unclear how many will return in the coming months. 
+- Coverage: While the survey was conducted after the nationwide Covid-19 lockdown was lifted, several migrant households in the community that had travelled to their native villages had not returned. Our local coordinator believes there are approximately 200 households like this, and it is unclear how many will return in the coming months. 
 
-- Data quality: The surveyors had no prior digital data collection experience. While the survey was simple, there is a possibility that huts were missed or minor errors crept into data collection, particularly for potentially tricky questions such as identifying who counts as a household member. While surveyors were monitored closely during data collection, conducting back-checks on the data was outside the scope of this activity and so it is tough to quantify the magnitude of such errors. That said, the team remains confident that the data is good enough to meet the purposes laid out above.
+- Data quality: The surveyors had no prior digital data collection experience. While the survey was simple, there is a possibility that huts were missed or minor errors crept into data collection, particularly for tricky questions such as identifying who counts as a household member. While surveyors were monitored closely during data collection, conducting back-checks on the data was outside the scope of this activity and so it is tough to quantify the magnitude of such errors. *That said, we remain confident that the data is good enough to meet the purposes laid out above.*
 
-## Demographics
+## Demographics and basic household profile
 
-In total, we found `r nrow(hh)` households, totalling `r sum(hh$hh_size, na.rm = TRUE)` individuals. The map below shows the spatial distribution of households; there appear to be a few clear clusters of households closer to the Noida Link Road and Mayur Vihar-1, with density decreasing closer to the river's edge.   
+In total, we found `r nrow(hh)` households, totalling `r sum(hh$hh_size, na.rm = TRUE)` individuals. The map below shows the spatial distribution of households; there appear to be a few clear clusters closer to the Noida Link Road and Mayur Vihar-1, with density decreasing closer to the river bank.
+
+It is significant that this is a community of "squatters"; that is, the [land is owned by the Delhi Development Authority](https://www.hindustantimes.com/cities/dda-demolishes-hundreds-of-hutments-on-yamuna-floodplain/story-x105Sl8yPf2tLgUFM0XLRK.html), and its proximity to the riverbed does not allow in-situ development of permanent housing. Most households live in huts or shacks, as you will notice in the pictures on the home page.
 
 ```{r fullmap}
 
 # Creating map showing HH distribution of points
 boundariesdta <- fortify(boundaries)
 
-
 qmplot(data = hh[hh$location_accuracy < 20,], x = longitude, y = latitude) +
   stat_density2d(aes(fill = ..level..), bins = 30, size = 0.01, geom = "polygon", alpha = 0.1) 
 
 ```
 
+In spite of this, a large majority of those living here are living as families. The average household size is `r mean(hh$hh_size, na.rm = TRUE) %>% round(digits = 1)` members, with only `r nrow(hh[hh$hh_size == 1,])` single-member households. 
+
+This point is re-iterated when we observe the age distribution of individuals; **`r round(100*sum(ind$age < 18)/length(ind$age), digits = 1)`% of individuals are under the age of 18!**
 
 
-```{r demographisc}
+```{r hhsize}
+
 # Household size distribution
-hhsize_mean <- mean(hh$hh_size, na.rm = TRUE) %>% round(digits = 1)
-hhsize_sd <- sd(hh$hh_size, na.rm = TRUE) %>% round(digits = 1)
-
 ggplot(hh, aes(x = hh_size)) + 
-  geom_bar(fill = 'tomato', color = 'firebrick4', alpha = 0.3) + 
-  geom_vline(xintercept = hhsize_mean, size = 0.5) + 
-  scale_x_discrete("Number of members in the household", breaks=1:10)+
-  theme_tufte()+
-  ggtitle("Distribution of household size", subtitle = paste("Mean =",hhsize_mean,"members | St. dev =",hhsize_sd))
-
-# Gender distribution
-tab(ind, gender) %>% filter(gender != "") %>% kable()
-
-# Individual age distribution
-age_mean <- mean(ind$age, na.rm = TRUE) %>% round(digits = 1)
-age_sd <- sd(ind$age, na.rm = TRUE) %>% round(digits = 1)
-
-ind$under_18 <- as.factor(ind[,'age'] < 18)
-levels(ind$under_18) <- c('Under 18 years','Above 18 years')
-
-ggplot(ind, aes(x = age)) + 
-  geom_histogram(aes(y = ..density.., fill = under_18), binwidth = 2) + 
-  geom_density(size = 1, adjust = 5, color = 'firebrick4') + 
-  ggtitle("Distribution of age", subtitle = paste("Mean =",age_mean,"years | St. dev =",age_sd)) 
-
-
-ggplot(subset(ind, gender == 'Male' | gender == 'Female'), aes(x = age)) + 
-  geom_histogram(aes(y = ..density..), binwidth = 2) + 
-  geom_density(size = 1, adjust = 5, color = 'firebrick4') + 
-  facet_wrap(~gender)
-
-
+  geom_bar(fill = 'lightblue3', color = 'navyblue') + 
+  geom_vline(xintercept = mean(hh$hh_size, na.rm = TRUE), size = 0.5) + 
+  scale_x_continuous(breaks=1:10, labels = 1:10)+
+  ylab('Number of households') + xlab('') +
+  theme(panel.background = element_blank(), panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  ggtitle("Distribution of household size (number of members)")
 
 ```
 
-It is clear from both the household size and age distribution of the dataset, that this community primarily consists of families living together. The average household size is `r hhsize_mean` members, and `r mean(ind$under_18, na.rm = TRUE)*100 %>% round(digits = 1)`% of individuals are under the age of 18. The age distribution is particularly striking; there are very few elderly in the community.
 
+## Forthcoming analysis
 
-Timing of survey; many people had gone back home due to coronavirus
-
-## Access to services (and therefore basic government schemes)
-
-- Talk about JAM trinity; duplicate phone numbers? Multiple HHs giving the same number
-
-- Length of stay
-- Household-level; ration card, with at least one member having a bank account
-- % with aadhaar, % of hhs with ration, % of adults with bakn accounts, with voter IDs
-(differences in bank account ownership between males and efmales, by age)
-- Do these on a map with the dots to see an clear patterns
-
-Bank account; check if it is correlated with age at all. Check the dynamics; if people co-located close to each other are more likely to have an account
-
-Note that for geospatial stuff - we are in Delhi, so it is unlikely that there is systematically bad network coverage in certain pockets - a reasonable assumption that these were random - pass the visual test that we see points everywhere. So it's fine to keep only those with a better accuracy and analyse them. 
-
-## Access to basic items
-
-
--	Delhi government says development can’t happen because it’s 300m from the banks of the Yamuna 
--	However, the issue is Delhi Development Authority (DDA) comes and demolishes constructions and evicts people without giving fair dues https://www.hindustantimes.com/cities/dda-demolishes-hundreds-of-hutments-on-yamuna-floodplain/story-x105Sl8yPf2tLgUFM0XLRK.html
-
-- Some photos of the area; mainly engaged in agriculture, living in huts, some as labourers. Migrant community
+- Distribution of education levels
+- Access to services, and therefore access to basic government schemes (phone, bank accounts, ration card, Aadhaar card, voter ID)
+- And more!
 
 
 
