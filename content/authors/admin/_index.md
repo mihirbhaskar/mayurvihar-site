@@ -1,7 +1,7 @@
 ---
 authors:
 - admin
-bio: My interests lie at the intersection of data and public policy.
+bio: 
 education:
   courses:
   - course: BA Economics
@@ -9,12 +9,10 @@ education:
     year: 2016
 email: "mihirbhaskar44@gmail.com"
 interests:
-- Administrative data
-- Public policy
 organizations:
 - name: J-PAL South Asia
   url: "https://www.povertyactionlab.org/"
-role: Research Manager (Data)
+role: Research Manager - Data
 social:
 - icon: envelope
   icon_pack: fas
@@ -25,8 +23,7 @@ social:
 superuser: true
 title: Mihir Bhaskar
 user_groups:
-- Researchers
-- Visitors
+- Project Leads
 ---
 
-Mihir Bhaskar is a Research Manager (Data) at J-PAL South Asia.
+I'm interested in the sensible and responsible use of data for public policy/development challenges. On the Mayur Vihar project, I work closely with Vikram (our field superstar) to brainstorm, raise funds for, and implement activities. I bring research inputs, good documentation and effective data collection experience to complement Vikram's field implementation expertise.

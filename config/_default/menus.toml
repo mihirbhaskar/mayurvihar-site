@@ -7,10 +7,11 @@
   name = "Home"
   url = "#intro"
   weight = 10
+  
 
 [[main]]
   name = "About the community"
-  url = "listing/"
+  url = "listing_results"
   weight = 20
   
 [[main]]

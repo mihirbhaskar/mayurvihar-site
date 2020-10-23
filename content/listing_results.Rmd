@@ -3,6 +3,7 @@ title: "Census survey"
 author: "Mihir Bhaskar"
 output: html_document
 weight: 10
+profile: false
 ---
 
 ```{r setup, include=FALSE}
