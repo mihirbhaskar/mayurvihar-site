@@ -23,6 +23,11 @@
   name = "Mosquito nets"
   url = "nets/"
   weight = 40
+  
+[[main]]
+  name = "Meet the team"
+  url = "#people"
+  weight = 50
 
 
 

@@ -1,19 +1,30 @@
 ---
-title: "Census survey"
+title: "About the community"
 author: "Mihir Bhaskar"
-output: html_document
+output: 
+  blogdown::html_page:
+    toc: true
 weight: 10
 profile: false
 ---
 
 
+<div id="TOC">
+<ul>
+<li><a href="#motivation">Motivation</a></li>
+<li><a href="#what-we-did">What we did</a></li>
+<li><a href="#household-profile">Household profile</a></li>
+<li><a href="#education">Education</a></li>
+<li><a href="#forthcoming-analysis">Forthcoming analysis</a></li>
+</ul>
+</div>
 
 <div id="motivation" class="section level2">
 <h2>Motivation</h2>
 <p>We decided that if we were going to work with a community, it was important to:</p>
 <ol style="list-style-type: decimal">
-<li><p>Define the boundaries clearly and get a sense of the total number of individuals and households living within these boundaries. This would in-turn help in the planning and logistics of any sub-project by answering questions like: “How many mosquito nets should we procure?”</p></li>
-<li><p>Understand some socio-demographic characteristics to help brainstorm and target the most useful interventions. For example, finding out if the community primarily comprises of young men living alone or of full families would inform a very different set of interventions.</p></li>
+<li><p>Define the boundaries clearly and get a sense of the total number of individuals and households living within these boundaries. This would in-turn help the planning and logistics of any sub-project by answering questions like: “How many mosquito nets should we procure?”</p></li>
+<li><p>Understand some socio-demographic characteristics to brainstorm and target the most useful interventions. For example, finding out if the community primarily comprises of young men living alone or of full families would inform a very different set of interventions.</p></li>
 </ol>
 </div>
 <div id="what-we-did" class="section level2">
@@ -27,20 +38,465 @@ profile: false
 <li><p>Data quality: The surveyors had no prior digital data collection experience. While the survey was simple, there is a possibility that huts were missed or minor errors crept into data collection, particularly for tricky questions such as identifying who counts as a household member. While surveyors were monitored closely during data collection, conducting back-checks on the data was outside the scope of this activity and so it is tough to quantify the magnitude of such errors. <em>That said, we remain confident that the data is good enough to meet the purposes laid out above.</em></p></li>
 </ul>
 </div>
-<div id="demographics-and-basic-household-profile" class="section level2">
-<h2>Demographics and basic household profile</h2>
+<div id="household-profile" class="section level2">
+<h2>Household profile</h2>
 <p>In total, we found 1495 households, totalling 6385 individuals. The map below shows the spatial distribution of households; there appear to be a few clear clusters closer to the Noida Link Road and Mayur Vihar-1, with density decreasing closer to the river bank.</p>
 <p>It is significant that this is a community of “squatters”; that is, the <a href="https://www.hindustantimes.com/cities/dda-demolishes-hundreds-of-hutments-on-yamuna-floodplain/story-x105Sl8yPf2tLgUFM0XLRK.html">land is owned by the Delhi Development Authority</a>, and its proximity to the riverbed does not allow in-situ development of permanent housing. Most households live in huts or shacks, as you will notice in the pictures on the home page.</p>
 <p><img src="/listing_results_files/figure-html/fullmap-1.png" width="672" /></p>
 <p>In spite of this, a large majority of those living here are living as families. The average household size is 4.3 members, with only 108 single-member households.</p>
-<p>This point is re-iterated when we observe the age distribution of individuals; <strong>46.2% of individuals are under the age of 18!</strong></p>
+<p>This point is re-iterated when we observe the age distribution: <strong>46.2% of individuals are under the age of 18!</strong></p>
 <p><img src="/listing_results_files/figure-html/hhsize-1.png" width="672" /></p>
+</div>
+<div id="education" class="section level2">
+<h2>Education</h2>
+<p>The data on education attainment paints a troubling picture.</p>
+<p><img src="/listing_results_files/figure-html/eduadult-1.png" width="672" /></p>
+<p>Of those over the age of 21, and thus likely to have completed their education, only 11% have passed 10th standard. A majority have not even finished primary education.</p>
+<p>What is arguably more concerning, is that this cycle of under-attainment seems to persist with children currently of schoolgoing age. Based on age alone, the light blue bars in the graph below show the number of children expected to have completed each grade level. It is cumulative, in the sense that a child aged 18 is expected to have completed 1st - 12th grade. The dark blue bars show the number of children that have actually completed these levels according to our survey.</p>
+<p><img src="/listing_results_files/figure-html/edukid-1.png" width="672" /></p>
+<p>While we may expect to see a gap in senior secondary levels (10-12), the gaps in primary and secondary education of a magnitude around 300 children is surprising. This is backed up by anecdotal evidence on the ground: children in the community may have dropped out to work in the fields or due to lack of interest, and despite now being old enough for a higher grade, do not have the numeracy or literacy skills to re-enroll at those levels. <strong>There is a clear need for remedial education to bring these kids back up to speed and re-enroll them in schools.</strong> Below is a picture of one such informal effort in the community. The demand and need for similar efforts is heightened due to the Covid-19 lockdown and related school closures.</p>
+<p><img src="/img/educ.jpeg" width="400" /></p>
+<p>What factors drive these dropouts and the resulting shortfalls in education attainment? The regressions below try and dig deeper into this question. It won’t be possible to say anything causal with confidence given the limited fields we collected, but it is an interesting exercise nonetheless.</p>
+<p>Below are models with two dependent variables. First, a binary variable on whether a child meets the level of education we expect given their age (1 = yes, 0 = no). Second, a variable subtracting expected education level from actual education level to capture the extent of shortfall. The dependent variables are constructed this way because:</p>
+<ol style="list-style-type: decimal">
+<li><p>Regressing education level directly would not account for the varying ages of the children. Both these measures benchmark education levels to what we expect given their ages.</p></li>
+<li><p>For both measures, we interpret positive coefficients as good; an increase in the likelihood of meeting the expected level, or an increase in actual - expected education (i.e. less shortfall)</p></li>
+</ol>
+<p><strong>Regressions predicting education attainment of children aged 7-18</strong></p>
+<table style="text-align:center">
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td colspan="2">
+Whether child is at expected level (binary)
+</td>
+<td>
+Difference between actual and expected level
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+<em>OLS</em>
+</td>
+<td>
+<em>probit</em>
+</td>
+<td>
+<em>OLS</em>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Child is male
+</td>
+<td>
+0.055<sup>*</sup>
+</td>
+<td>
+0.143<sup>*</sup>
+</td>
+<td>
+0.532<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.028)
+</td>
+<td>
+(0.073)
+</td>
+<td>
+(0.181)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Distance to school
+</td>
+<td>
+-0.074<sup>***</sup>
+</td>
+<td>
+-0.190<sup>***</sup>
+</td>
+<td>
+-0.342<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.020)
+</td>
+<td>
+(0.051)
+</td>
+<td>
+(0.127)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Average education level of adults in the HH
+</td>
+<td>
+0.019<sup>***</sup>
+</td>
+<td>
+0.050<sup>***</sup>
+</td>
+<td>
+0.179<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.005)
+</td>
+<td>
+(0.014)
+</td>
+<td>
+(0.033)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Number of HH members
+</td>
+<td>
+0.003
+</td>
+<td>
+0.008
+</td>
+<td>
+0.065
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.009)
+</td>
+<td>
+(0.024)
+</td>
+<td>
+(0.060)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Duration of stay in community
+</td>
+<td>
+0.029<sup>**</sup>
+</td>
+<td>
+0.076<sup>**</sup>
+</td>
+<td>
+0.320<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.015)
+</td>
+<td>
+(0.037)
+</td>
+<td>
+(0.093)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+HH has mosquito net
+</td>
+<td>
+-0.086
+</td>
+<td>
+-0.214
+</td>
+<td>
+-0.597
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.117)
+</td>
+<td>
+(0.306)
+</td>
+<td>
+(0.749)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+HH has working light
+</td>
+<td>
+-0.239<sup>**</sup>
+</td>
+<td>
+-0.641<sup>**</sup>
+</td>
+<td>
+-1.782<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.099)
+</td>
+<td>
+(0.265)
+</td>
+<td>
+(0.632)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+HH has toilet
+</td>
+<td>
+0.076
+</td>
+<td>
+0.212
+</td>
+<td>
+-0.446
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.116)
+</td>
+<td>
+(0.311)
+</td>
+<td>
+(0.744)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Constant
+</td>
+<td>
+0.405<sup>***</sup>
+</td>
+<td>
+-0.251
+</td>
+<td>
+-3.427<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+(0.110)
+</td>
+<td>
+(0.282)
+</td>
+<td>
+(0.700)
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+</td>
+<td>
+</td>
+<td>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+Observations
+</td>
+<td>
+1,239
+</td>
+<td>
+1,239
+</td>
+<td>
+1,239
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+R<sup>2</sup>
+</td>
+<td>
+0.036
+</td>
+<td>
+</td>
+<td>
+0.053
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+F Statistic (df = 8; 1230)
+</td>
+<td>
+5.662<sup>***</sup>
+</td>
+<td>
+</td>
+<td>
+8.570<sup>***</sup>
+</td>
+</tr>
+<tr>
+<td colspan="4" style="border-bottom: 1px solid black">
+</td>
+</tr>
+<tr>
+<td style="text-align:left">
+<em>Note:</em>
+</td>
+<td colspan="3" style="text-align:right">
+<sup><em></sup>p&lt;0.1; <sup><strong></sup>p&lt;0.05; <sup></strong></em></sup>p&lt;0.01
+</td>
+</tr>
+</table>
+<p>As expected, the explanatory power of these models are low (R-squared = 3-5%) given the limited variables collected. A summary of the key findings from the variables we do have are as follows:</p>
+<ul>
+<li><p><strong><span style="color: DarkRed;">Greater distance from the child’s household to the nearest school has a significant negative effect.</span></strong> Distance was calculated as the Euclidean distance (straight line) from the lat-long of the household to the lat-long of the nearest school, so is likely to be lower than the actual travel path but is a decent proxy. This measure ranges from 0.6km to 3.4km, so it is plausible that children to the right tail of this distribution might be reluctant to walk these distances.</p></li>
+<li><p><strong><span style="color: DarkGreen;">Higher average education level of adults in the household has a significant positive effect.</span></strong> This persistence across generations/older-to-younger siblings makes intuitive sense, even if the exact channels are unclear.</p></li>
+<li><p><strong><span style="color: DarkRed;">While male and female children are both similarly likely to not match up to the expected education level, males are still 0.5 school years closer than females.</span></strong></p></li>
+<li><p><strong><span style="color: DarkGreen;">Children that have been living in the same community for a longer period of time have better outcomes.</span></strong> This also makes intuitive sense; migrant households that move frequently may find it difficult to enroll and keep their children in these schools.</p></li>
+<li><p><strong><span style="color: DarkSlateGray;">Factors like household size or access to mosquito nets have no significant effect.</span></strong></p></li>
+</ul>
 </div>
 <div id="forthcoming-analysis" class="section level2">
 <h2>Forthcoming analysis</h2>
 <ul>
-<li>Distribution of education levels</li>
-<li>Access to services, and therefore access to basic government schemes (phone, bank accounts, ration card, Aadhaar card, voter ID)</li>
-<li>And more!</li>
+<li>Access to services and basic government schemes (phone, bank accounts, ration card, Aadhaar card, voter ID)</li>
 </ul>
 </div>
