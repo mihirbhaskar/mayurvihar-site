@@ -26,4 +26,4 @@ user_groups:
 - Project Leads
 ---
 
-I'm interested in the sensible and responsible use of data for public policy/development challenges. On the Mayur Vihar project, I work closely with Vikram (our field superstar) to brainstorm, raise funds for, and implement activities. I bring research inputs, good documentation and effective data collection experience to complement Vikram's field implementation expertise.
+I'm interested in the sensible and responsible use of data for public policy/development challenges. On the Mayur Vihar project, I work closely with Vikram (the main driving force for this work) to brainstorm, raise funds for, and implement activities. To complement Vikram's field knowledge and implementation experience, I help provide research inputs, good documentation and data collection experience.
