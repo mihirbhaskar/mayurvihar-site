@@ -8,6 +8,7 @@ weight: 10
 profile: false
 ---
 
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 <div id="TOC">
 <ul>
@@ -30,7 +31,7 @@ profile: false
 <div id="what-we-did" class="section level2">
 <h2>What we did</h2>
 <p>We designed and conducted a <strong>short survey</strong> intended to capture basic details about <strong>every household</strong> living within the defined boundaries. You can see these boundaries on the homepage.</p>
-<p>Our local coordinator, Vikram, identified and trained 12 surveyors to go door-to-door and fill out a digital form using SurveyCTO on their smartphones. You can view the form <a href="https://mayurvihar.surveycto.com/collect/listing_v1?caseid="><strong>here</strong></a>.</p>
+<p>Our local coordinator, Vikram, identified and trained 12 surveyors to go door-to-door and fill out a digital form using SurveyCTO on their smartphones. You can view the form <a href="https://www.dropbox.com/s/sqhaiphz4ehfrtl/listing_final_instrument.xlsx?dl=0"><strong>here</strong></a>.</p>
 <p>The survey ran from 10th to 18th July, 2020 and covered 1495 households. Results from this data are presented below.</p>
 <p>Before proceeding, it’s worth flagging a few caveats and challenges faced during this exercise:</p>
 <ul>
@@ -41,9 +42,9 @@ profile: false
 <div id="household-profile" class="section level2">
 <h2>Household profile</h2>
 <p>In total, we found 1495 households, totalling 6385 individuals. The map below shows the spatial distribution of households; there appear to be a few clear clusters closer to the Noida Link Road and Mayur Vihar-1, with density decreasing closer to the river bank.</p>
-<p>It is significant that this is a community of “squatters”; that is, the <a href="https://www.hindustantimes.com/cities/dda-demolishes-hundreds-of-hutments-on-yamuna-floodplain/story-x105Sl8yPf2tLgUFM0XLRK.html">land is owned by the Delhi Development Authority</a>, and its proximity to the riverbed does not allow in-situ development of permanent housing. Most households live in huts or shacks, as you will notice in the pictures on the home page.</p>
+<p>Most households live in huts or shacks, as you will notice in the pictures on the home page.</p>
 <p><img src="/listing_results_files/figure-html/fullmap-1.png" width="672" /></p>
-<p>In spite of this, a large majority of those living here are living as families. The average household size is 4.3 members, with only 108 single-member households.</p>
+<p>A large majority of those living here are living as families. The average household size is 4.3 members, with only 108 single-member households.</p>
 <p>This point is re-iterated when we observe the age distribution: <strong>46.2% of individuals are under the age of 18!</strong></p>
 <p><img src="/listing_results_files/figure-html/hhsize-1.png" width="672" /></p>
 </div>
@@ -56,11 +57,11 @@ profile: false
 <p><img src="/listing_results_files/figure-html/edukid-1.png" width="672" /></p>
 <p>While we may expect to see a gap in senior secondary levels (10-12), the gaps in primary and secondary education of a magnitude around 300 children is surprising. This is backed up by anecdotal evidence on the ground: children in the community may have dropped out to work in the fields or due to lack of interest, and despite now being old enough for a higher grade, do not have the numeracy or literacy skills to re-enroll at those levels. <strong>There is a clear need for remedial education to bring these kids back up to speed and re-enroll them in schools.</strong> Below is a picture of one such informal effort in the community. The demand and need for similar efforts is heightened due to the Covid-19 lockdown and related school closures.</p>
 <p><img src="/img/educ.jpeg" width="400" /></p>
-<p>What factors drive these dropouts and the resulting shortfalls in education attainment? The regressions below try and dig deeper into this question. It won’t be possible to say anything causal with confidence given the limited fields we collected, but it is an interesting exercise nonetheless.</p>
+<p>What factors drive these dropouts and the resulting shortfalls in education attainment? The regressions below try and dig deeper into this question. It won’t be possible to say anything causal given the limited fields we collected (due to omitted variable bias), but it is an interesting descriptive exercise.</p>
 <p>Below are models with two dependent variables. First, a binary variable on whether a child meets the level of education we expect given their age (1 = yes, 0 = no). Second, a variable subtracting expected education level from actual education level to capture the extent of shortfall. The dependent variables are constructed this way because:</p>
 <ol style="list-style-type: decimal">
 <li><p>Regressing education level directly would not account for the varying ages of the children. Both these measures benchmark education levels to what we expect given their ages.</p></li>
-<li><p>For both measures, we interpret positive coefficients as good; an increase in the likelihood of meeting the expected level, or an increase in actual - expected education (i.e. less shortfall)</p></li>
+<li><p>For both measures, we interpret positive coefficients as being associated with good outcomes; an increase in the likelihood of meeting the expected level, or an increase in actual - expected education (i.e. less shortfall)</p></li>
 </ol>
 <p><strong>Regressions predicting education attainment of children aged 7-18</strong></p>
 <table style="text-align:center">
@@ -487,11 +488,11 @@ F Statistic (df = 8; 1230)
 </table>
 <p>As expected, the explanatory power of these models are low (R-squared = 3-5%) given the limited variables collected. A summary of the key findings from the variables we do have are as follows:</p>
 <ul>
-<li><p><strong><span style="color: DarkRed;">Greater distance from the child’s household to the nearest school has a significant negative effect.</span></strong> Distance was calculated as the Euclidean distance (straight line) from the lat-long of the household to the lat-long of the nearest school, so is likely to be lower than the actual travel path but is a decent proxy. This measure ranges from 0.6km to 3.4km, so it is plausible that children to the right tail of this distribution might be reluctant to walk these distances.</p></li>
-<li><p><strong><span style="color: DarkGreen;">Higher average education level of adults in the household has a significant positive effect.</span></strong> This persistence across generations/older-to-younger siblings makes intuitive sense, even if the exact channels are unclear.</p></li>
-<li><p><strong><span style="color: DarkRed;">While male and female children are both similarly likely to not match up to the expected education level, males are still 0.5 school years closer than females.</span></strong></p></li>
+<li><p><strong><span style="color: DarkRed;">Greater distance from the child’s household to the nearest school has a significant negative association</span></strong> Distance was calculated as the Euclidean distance (straight line) from the lat-long of the household to the lat-long of the nearest school, so is likely to be lower than the actual travel path but is a decent proxy. This measure ranges from 0.6km to 3.4km, so it is plausible that children to the right tail of this distribution might be reluctant to walk these distances.</p></li>
+<li><p><strong><span style="color: DarkGreen;">Higher average education level of adults in the household has a significant positive association</span></strong> This persistence across generations/older-to-younger siblings makes intuitive sense, even if the exact channels are unclear.</p></li>
+<li><p><strong><span style="color: DarkRed;">While male and female children are both similarly likely to not match up to the expected education level, males are still 0.5 school years closer than females on average</span></strong></p></li>
 <li><p><strong><span style="color: DarkGreen;">Children that have been living in the same community for a longer period of time have better outcomes.</span></strong> This also makes intuitive sense; migrant households that move frequently may find it difficult to enroll and keep their children in these schools.</p></li>
-<li><p><strong><span style="color: DarkSlateGray;">Factors like household size or access to mosquito nets have no significant effect.</span></strong></p></li>
+<li><p><strong><span style="color: DarkSlateGray;">Factors like household size or access to mosquito nets have no significant association</span></strong></p></li>
 </ul>
 </div>
 <div id="forthcoming-analysis" class="section level2">

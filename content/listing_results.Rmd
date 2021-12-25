@@ -50,18 +50,21 @@ register_google(key = api_key)
 
 #### Importing data and processing for analysis ####
 
+
+
+
 # Import listing hh data
-hh <- as.data.frame(read.csv('D:/Dropbox/Mayur Vihar Project/full_master_hh_data.csv')) 
+hh <- as.data.frame(read.csv('C:/Users/mihir/Dropbox/Mayur Vihar Project/full_master_hh_data.csv')) 
 
 # Import listing individual data
-ind <- as.data.frame(read.csv('D:/Dropbox/Mayur Vihar Project/full_master_ind_data.csv')) 
+ind <- as.data.frame(read.csv('C:/Users/mihir/Dropbox/Mayur Vihar Project/full_master_ind_data.csv')) 
 
 # Import boundary shapefile, drawn using Google Maps and exported as .kml
-boundaries <- readOGR("D:/Dropbox/Mayur Vihar Project/Listing Survey/Data/Raw/Blocks for listing.kml",
+boundaries <- readOGR("C:/Users/mihir/Dropbox/Mayur Vihar Project/Listing Survey/Data/Raw/Blocks for listing.kml",
                       require_geomType='wkbPolygon')
 
 # Import lat-longs of the nearby schools, marked using the same .kml file created on Google Maps
-schools <- readOGR("D:/Dropbox/Mayur Vihar Project/Listing Survey/Data/Raw/Blocks for listing.kml",
+schools <- readOGR("C:/Users/mihir/Dropbox/Mayur Vihar Project/Listing Survey/Data/Raw/Blocks for listing.kml",
                       require_geomType='wkbPoint')
 
 
@@ -123,7 +126,7 @@ We decided that if we were going to work with a community, it was important to:
 
 We designed and conducted a **short survey** intended to capture basic details about **every household** living within the defined boundaries. You can see these boundaries on the homepage.
 
-Our local coordinator, Vikram, identified and trained 12 surveyors to go door-to-door and fill out a digital form using SurveyCTO on their smartphones. You can view the form [**here**](https://mayurvihar.surveycto.com/collect/listing_v1?caseid=). 
+Our local coordinator, Vikram, identified and trained 12 surveyors to go door-to-door and fill out a digital form using SurveyCTO on their smartphones. You can view the form [**here**](https://www.dropbox.com/s/sqhaiphz4ehfrtl/listing_final_instrument.xlsx?dl=0). 
 
 The survey ran from 10th to 18th July, 2020 and covered `r nrow(hh)` households. Results from this data are presented below.
 
@@ -137,7 +140,7 @@ Before proceeding, it's worth flagging a few caveats and challenges faced during
 
 In total, we found `r nrow(hh)` households, totalling `r sum(hh$hh_size, na.rm = TRUE)` individuals. The map below shows the spatial distribution of households; there appear to be a few clear clusters closer to the Noida Link Road and Mayur Vihar-1, with density decreasing closer to the river bank.
 
-It is significant that this is a community of "squatters"; that is, the [land is owned by the Delhi Development Authority](https://www.hindustantimes.com/cities/dda-demolishes-hundreds-of-hutments-on-yamuna-floodplain/story-x105Sl8yPf2tLgUFM0XLRK.html), and its proximity to the riverbed does not allow in-situ development of permanent housing. Most households live in huts or shacks, as you will notice in the pictures on the home page.
+Most households live in huts or shacks, as you will notice in the pictures on the home page.
 
 ```{r fullmap}
 
@@ -147,7 +150,7 @@ qmplot(data = hh[hh$location_accuracy < 20,], x = longitude, y = latitude) +
 
 ```
 
-In spite of this, a large majority of those living here are living as families. The average household size is `r mean(hh$hh_size, na.rm = TRUE) %>% round(digits = 1)` members, with only `r nrow(hh[hh$hh_size == 1,])` single-member households. 
+A large majority of those living here are living as families. The average household size is `r mean(hh$hh_size, na.rm = TRUE) %>% round(digits = 1)` members, with only `r nrow(hh[hh$hh_size == 1,])` single-member households. 
 
 This point is re-iterated when we observe the age distribution: **`r round(100*sum(ind$age < 18)/length(ind$age), digits = 1)`% of individuals are under the age of 18!**
 
@@ -216,13 +219,13 @@ While we may expect to see a gap in senior secondary levels (10-12), the gaps in
 <img src="/img/educ.jpeg" width="400" />
 
 
-What factors drive these dropouts and the resulting shortfalls in education attainment? The regressions below try and dig deeper into this question. It won't be possible to say anything causal with confidence given the limited fields we collected, but it is an interesting exercise nonetheless.
+What factors drive these dropouts and the resulting shortfalls in education attainment? The regressions below try and dig deeper into this question. It won't be possible to say anything causal given the limited fields we collected (due to omitted variable bias), but it is an interesting descriptive exercise.
 
 Below are models with two dependent variables. First, a binary variable on whether a child meets the level of education we expect given their age (1 = yes, 0 = no). Second, a variable subtracting expected education level from actual education level to capture the extent of shortfall. The dependent variables are constructed this way because:
 
 1. Regressing education level directly would not account for the varying ages of the children. Both these measures benchmark education levels to what we expect given their ages.
 
-2. For both measures, we interpret positive coefficients as good; an increase in the likelihood of meeting the expected level, or an increase in actual - expected education (i.e. less shortfall) 
+2. For both measures, we interpret positive coefficients as being associated with good outcomes; an increase in the likelihood of meeting the expected level, or an increase in actual - expected education (i.e. less shortfall) 
 
 **Regressions predicting education attainment of children aged 7-18**
 
@@ -306,15 +309,15 @@ stargazer(lm.1, lm.2, lm.3, type = "html",
 
 As expected, the explanatory power of these models are low (R-squared = 3-5%) given the limited variables collected. A summary of the key findings from the variables we do have are as follows:
 
-- **`r colorize("Greater distance from the child's household to the nearest school has a significant negative effect.", "DarkRed")`** Distance was calculated as the Euclidean distance (straight line) from the lat-long of the household to the lat-long of the nearest school, so is likely to be lower than the actual travel path but is a decent proxy. This measure ranges from `r min(schoolreg$schooldist, na.rm = TRUE) %>% round(digits = 1)`km to `r max(schoolreg$schooldist, na.rm = TRUE) %>% round(digits = 1)`km, so it is plausible that children to the right tail of this distribution might be reluctant to walk these distances.
+- **`r colorize("Greater distance from the child's household to the nearest school has a significant negative association", "DarkRed")`** Distance was calculated as the Euclidean distance (straight line) from the lat-long of the household to the lat-long of the nearest school, so is likely to be lower than the actual travel path but is a decent proxy. This measure ranges from `r min(schoolreg$schooldist, na.rm = TRUE) %>% round(digits = 1)`km to `r max(schoolreg$schooldist, na.rm = TRUE) %>% round(digits = 1)`km, so it is plausible that children to the right tail of this distribution might be reluctant to walk these distances.
 
-- **`r colorize("Higher average education level of adults in the household has a significant positive effect.", "DarkGreen")`** This persistence across generations/older-to-younger siblings makes intuitive sense, even if the exact channels are unclear.
+- **`r colorize("Higher average education level of adults in the household has a significant positive association", "DarkGreen")`** This persistence across generations/older-to-younger siblings makes intuitive sense, even if the exact channels are unclear.
 
-- **`r colorize("While male and female children are both similarly likely to not match up to the expected education level, males are still 0.5 school years closer than females.", "DarkRed")`**
+- **`r colorize("While male and female children are both similarly likely to not match up to the expected education level, males are still 0.5 school years closer than females on average", "DarkRed")`**
 
 - **`r colorize("Children that have been living in the same community for a longer period of time have better outcomes.", "DarkGreen")`** This also makes intuitive sense; migrant households that move frequently may find it difficult to enroll and keep their children in these schools.
 
-- **`r colorize("Factors like household size or access to mosquito nets have no significant effect.", "DarkSlateGray")`**
+- **`r colorize("Factors like household size or access to mosquito nets have no significant association", "DarkSlateGray")`**
 
 ## Forthcoming analysis
 - Access to services and basic government schemes (phone, bank accounts, ration card, Aadhaar card, voter ID)

@@ -10,9 +10,7 @@ education:
 email: "mihirbhaskar44@gmail.com"
 interests:
 organizations:
-- name: J-PAL South Asia
-  url: "https://www.povertyactionlab.org/"
-role: Research Manager - Data
+role: 
 social:
 - icon: envelope
   icon_pack: fas
